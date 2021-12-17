@@ -2,7 +2,9 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/shihuo-cn/mockit)](https://goreportcard.com/report/github.com/shihuo-cn/mockit)
 ![Go](https://github.com/shihuo-cn/mockit/workflows/Go/badge.svg)
 ## 目标：将mock变得简单，让代码维护变得容易
-
+## 分支介绍
+- main 主分支，覆盖了单元测试
+- light 轻分支，去除了单元测试，简化了依赖项，方便其他团队使用
 ## 常见Mock难点
 - 不同中间件，mock库设计模式不一致，学习代价高，差异化明显
 - mock方案强依赖服务端，无法灵活解耦
