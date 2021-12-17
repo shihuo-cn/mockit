@@ -1,16 +1,13 @@
 package mockit
 
 import (
+	"database/sql"
 	"database/sql/driver"
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/alicebob/miniredis"
 	"github.com/golang/mock/gomock"
 	"github.com/jarcoal/httpmock"
-	jinzhugorm "github.com/jinzhu/gorm"
-	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
-	"gorm.io/driver/mysql"
-	iogorm "gorm.io/gorm"
 	"net/http"
 	"reflect"
 	"testing"
@@ -43,12 +40,8 @@ type Mockit interface {
 
 	// InterceptHttpClient 拦截http client
 	InterceptHttpClient(client *http.Client)
-	// Gorm2DB 获取伪grom2.db做mock用
-	// NOTEL: gorm.io/gorm
-	Gorm2DB() *iogorm.DB
-	// GormDB 获取伪grom.db做mock用
-	// NOTE: github.com/jinzhu/gorm
-	GormDB() *jinzhugorm.DB
+	// SqlDB 获取db conn
+	SqlDB() *sql.DB
 	// RedisAddr 获取伪redis server addr
 	RedisAddr() string
 }
@@ -56,8 +49,7 @@ type Mockit interface {
 type mockit struct {
 	sqlEx        sqlmock.Sqlmock      // sql excepted
 	redisSrv     *miniredis.Miniredis // redis server
-	gorm2DB      *iogorm.DB           // gorm.io conn
-	gormDB       *jinzhugorm.DB       // jinzhu conn
+	sqlDB        *sql.DB              // gorm.io conn
 	ormTag       string               // 实体解析的tag
 	clientInitFs []MockClientInitFunc
 	iFaceClients map[string]interface{}
@@ -83,32 +75,16 @@ func NewWithMockTag(tag string, fs ...MockClientInitFunc) (Mockit, error) {
 	kit.ormTag = tag
 	sqlDB, mock, err := sqlmock.New()
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, err
 	}
 	kit.sqlEx = mock
-	// gorm2 io
-	gormDB, err := iogorm.Open(mysql.New(mysql.Config{
-		Conn:                      sqlDB,
-		SkipInitializeWithVersion: true,
-	}), &iogorm.Config{})
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-	// gorm  jinzhu
-	jinZhuDB, err := jinzhugorm.Open("mysql", sqlDB)
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-	kit.gormDB = jinZhuDB
-	kit.gorm2DB = gormDB
-
+	kit.sqlDB = sqlDB
 	// redis
 	kit.redisSrv, err = miniredis.Run()
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, err
 	}
 	// 初始化interface mock 并通过内部反射解耦原库使用
-
 	t := log.New()
 	t.SetFormatter(&log.TextFormatter{
 		DisableColors: true,
@@ -354,11 +330,11 @@ func (mk *mockit) InterceptHttpClient(client *http.Client) {
 	httpmock.ActivateNonDefault(client)
 }
 
-func (mk *mockit) Gorm2DB() *iogorm.DB {
+func (mk *mockit) SqlDB() *sql.DB {
 	if mk == nil {
 		return nil
 	}
-	return mk.gorm2DB
+	return mk.sqlDB
 }
 
 func (mk *mockit) RedisAddr() string {
@@ -366,11 +342,4 @@ func (mk *mockit) RedisAddr() string {
 		return ""
 	}
 	return mk.redisSrv.Addr()
-}
-
-func (mk *mockit) GormDB() *jinzhugorm.DB {
-	if mk == nil {
-		return nil
-	}
-	return mk.gormDB
 }
