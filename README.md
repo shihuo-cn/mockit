@@ -55,6 +55,5 @@ replace github.com/DATA-DOG/go-sqlmock v1.5.0 => github.com/Rennbon/go-sqlmock v
 - https://github.com/alicebob/miniredis
 - https://github.com/go-redis/redis
 - https://github.com/olivere/elastic
-- https://github.com/jinzhu/gorm
 - https://github.com/go-gorm/gorm
 

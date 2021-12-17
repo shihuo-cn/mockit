@@ -10,7 +10,6 @@ require (
 	github.com/golang/mock v1.6.0
 	github.com/gomodule/redigo v1.8.6 // indirect
 	github.com/jarcoal/httpmock v1.0.8
-	github.com/jinzhu/gorm v1.9.16
 	github.com/olivere/elastic/v7 v7.0.29
 	github.com/pkg/errors v0.9.1
 	github.com/sirupsen/logrus v1.8.1
