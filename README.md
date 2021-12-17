@@ -1,4 +1,5 @@
 # Mockit
+[![Go Report Card](https://goreportcard.com/badge/github.com/shihuo-cn/mockit)](https://goreportcard.com/report/github.com/shihuo-cn/mockit)
 ![Go](https://github.com/shihuo-cn/mockit/workflows/Go/badge.svg)
 ## 目标：将mock变得简单，让代码维护变得容易
 
