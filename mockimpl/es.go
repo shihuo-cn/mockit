@@ -46,7 +46,7 @@ func (m MockEs) List(ctx context.Context, relationId int64, pageIndex, pageSize 
 	if msgNum == 0 {
 		return nil, nil
 	}
-	list := make([]*iface.KV, msgNum, msgNum)
+	list := make([]*iface.KV, msgNum)
 	for i, item := range res.Each(reflect.TypeOf(&iface.KV{})) {
 		list[i] = item.(*iface.KV)
 	}

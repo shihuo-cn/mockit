@@ -1,4 +1,5 @@
 # Mockit
+![Go](https://github.com/shihuo-cn/mockit/workflows/Go/badge.svg)
 ## 目标：将mock变得简单，让代码维护变得容易
 
 ## 常见Mock难点

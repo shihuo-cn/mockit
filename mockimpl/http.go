@@ -36,6 +36,9 @@ func (m *MockHttp) First(ctx context.Context, key int64) (int64, error) {
 		return 0, errors.New(resp.Status)
 	}
 	buff, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return 0, err
+	}
 	num, err := strconv.ParseInt(string(buff), 10, 64)
 	if err != nil {
 		return 0, err
@@ -56,6 +59,9 @@ func (m *MockHttp) List(ctx context.Context, relationId int64, pageIndex, pageSi
 		return nil, errors.New(resp.Status)
 	}
 	buff, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
 	var arr []*iface.KV
 	err = json.Unmarshal(buff, &arr)
 	if err != nil {

@@ -145,9 +145,6 @@ func (mk *mockit) GetInterfaceClient(name string) interface{} {
 
 func (mk *mockit) MysqlExecExpect(ep ExpectParam, tb testing.TB) {
 	p := ep.(*expectParam)
-	if p == nil {
-		tb.Fatal("param is nil")
-	}
 	if len(p.method) == 0 {
 		tb.Fatal("there is no SQL statements in the method filed")
 	}
@@ -157,25 +154,19 @@ func (mk *mockit) MysqlExecExpect(ep ExpectParam, tb testing.TB) {
 	var num1, num2 int64
 	for k, v := range p.returns {
 		var numTmp int64
-		switch v.(type) {
+		switch tmp := v.(type) {
 		case uint:
-			numTmp = int64(v.(uint))
-			break
+			numTmp = int64(tmp)
 		case int:
-			numTmp = int64(v.(int))
-			break
+			numTmp = int64(tmp)
 		case int64:
-			numTmp = int64(v.(int64))
-			break
+			numTmp = int64(tmp)
 		case int32:
-			numTmp = int64(v.(int32))
-			break
+			numTmp = int64(tmp)
 		case uint32:
-			numTmp = int64(v.(uint32))
-			break
+			numTmp = int64(tmp)
 		case uint64:
-			numTmp = int64(v.(uint64))
-			break
+			numTmp = int64(tmp)
 		default:
 			tb.Fatal("the returns type must be int of the func mysqlExecExpect")
 		}
@@ -243,7 +234,6 @@ func (mk *mockit) InterfaceExpect(ep ExpectParam, tb testing.TB) {
 		for i, arg := range p.args {
 			inputs[i] = reflect.ValueOf(arg)
 		}
-		break
 	case byIndex:
 		for i := 0; i < numIn; i++ {
 			if arg, exists := p.idxArgs[i]; exists {
@@ -252,12 +242,10 @@ func (mk *mockit) InterfaceExpect(ep ExpectParam, tb testing.TB) {
 				inputs[i] = reflect.ValueOf(gomock.Any())
 			}
 		}
-		break
 	default:
 		for i := 0; i < numIn; i++ {
 			inputs[i] = reflect.ValueOf(gomock.Any())
 		}
-		break
 	}
 	outputs := method.Call(inputs)
 	if len(outputs) != 1 {
@@ -303,7 +291,6 @@ func (mk *mockit) HttpExpect(ep ExpectParam, tb testing.TB, httpStatus ...int) {
 			tb.Fatal("responseHandler is nil")
 		}
 		resp = p.responseHandler
-		break
 	case HttpResponseString:
 		str, ok := p.val.(string)
 		if !ok {
@@ -315,24 +302,20 @@ func (mk *mockit) HttpExpect(ep ExpectParam, tb testing.TB, httpStatus ...int) {
 		if err != nil {
 			tb.Fatalf("NewJsonResponder failed:%s", err)
 		}
-		break
 	default:
 		if len(p.returns) != 1 {
 			tb.Fatal("response nil, please set response via any one of WithKeyValReturn/WithHttpResponseHandler/WithReturns")
 		}
 		arg := p.returns[0]
-		switch arg.(type) {
+		switch argTmp := arg.(type) {
 		case string:
-			resp = httpmock.NewStringResponder(status, arg.(string))
-			break
+			resp = httpmock.NewStringResponder(status, argTmp)
 		default:
 			resp, err = httpmock.NewJsonResponder(status, arg)
 			if err != nil {
 				tb.Fatalf("NewJsonResponder failed:%s", err)
 			}
-			break
 		}
-		break
 	}
 	httpmock.RegisterResponder(
 		p.method,

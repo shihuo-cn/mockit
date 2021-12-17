@@ -312,13 +312,10 @@ func TestMockHttp(t *testing.T) {
 				switch rid {
 				case "1":
 					resp = expectResponse1
-					break
 				case "2":
 					resp = expectResponse2
-					break
 				default:
 					resp = make([]*iface.KV, 0)
-					break
 				}
 				return httpmock.NewJsonResponse(http.StatusOK, resp)
 			})
