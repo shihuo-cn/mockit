@@ -7,6 +7,8 @@ import (
 	"github.com/shihuo-cn/mockit/iface"
 	"github.com/shihuo-cn/mockit/mockimpl"
 	"github.com/stretchr/testify/assert"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 	"net/http"
 	"os"
 	"testing"
@@ -44,14 +46,21 @@ func TestMain(m *testing.M) {
 		kit.InterceptHttpClient(cli)
 		mockInterface := kit.GetInterfaceClient("MockDemoInterface")
 		iface := mockInterface.(*mockimpl.MockDemoInterface)
-
+		// gorm2 io
+		gormDB, err := gorm.Open(mysql.New(mysql.Config{
+			Conn:                      kit.SqlDB(),
+			SkipInitializeWithVersion: true,
+		}), &gorm.Config{})
+		if err != nil {
+			panic(err)
+		}
 		// 拦截
 		srv = &mockSrv{
 			es:      mockimpl.NewMockEs(cli),
 			httpCli: mockimpl.NewMockHttp(cli),
 			iface:   iface,
 			redis:   mockimpl.NewMockRedis(kit.RedisAddr()),
-			mysql:   mockimpl.NewSqlDao(kit.Gorm2DB()),
+			mysql:   mockimpl.NewSqlDao(gormDB),
 		}
 	}
 	os.Exit(m.Run())
