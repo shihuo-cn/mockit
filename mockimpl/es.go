@@ -9,7 +9,6 @@ import (
 	"time"
 )
 
-
 var _ iface.DemoInterface = &MockEs{}
 
 func NewMockEs(cli *http.Client) *MockEs {
@@ -57,4 +56,3 @@ func (m MockEs) List(ctx context.Context, relationId int64, pageIndex, pageSize 
 func (m MockEs) Aggregate(ctx context.Context, dm *iface.DemoInterfaceModel, time time.Time) ([]*iface.DemoInterfaceModel, int, error) {
 	panic("implement me")
 }
-

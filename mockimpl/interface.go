@@ -26,12 +26,11 @@ type MockDemoInterfaceMockRecorder struct {
 
 // NewMockDemoInterface creates a new mock instance.
 //func NewMockDemoInterface(ctrl *gomock.Controller) *MockDemoInterface
-func NewMockDemoInterface(ctrl *gomock.Controller) interface{}{
+func NewMockDemoInterface(ctrl *gomock.Controller) interface{} {
 	mock := &MockDemoInterface{ctrl: ctrl}
 	mock.recorder = &MockDemoInterfaceMockRecorder{mock}
 	return mock
 }
-
 
 // EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockDemoInterface) EXPECT() *MockDemoInterfaceMockRecorder {
