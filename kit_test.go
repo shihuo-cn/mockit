@@ -201,6 +201,20 @@ func TestMockMySql(t *testing.T) {
 		assert.Nil(t, err)
 		assert.EqualValues(t, expectedReturns, res)
 	})
+	t.Run("error return", func(t *testing.T) {
+		relationId := int64(200)
+		pageIndex := 2
+		pageSize := 20
+		errExpected := gorm.ErrRecordNotFound
+		p := NewExpectParam().
+			WithMethod("SELECT (.+) FROM `demo` WHERE relation_id = (.+)").
+			WithArgs(relationId, false).
+			WithReturns(errExpected)
+		kit.MysqlQueryExpect(p, t)
+		res, err := srv.mysql.List(ctx, relationId, pageIndex, pageSize)
+		assert.Equal(t, errExpected, err)
+		assert.Nil(t, res)
+	})
 }
 
 func TestMockRedis(t *testing.T) {
