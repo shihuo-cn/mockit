@@ -161,10 +161,13 @@ func (mk *mockit) MysqlExecExpect(ep ExpectParam, tb testing.TB) {
 	mk.sqlEx.ExpectCommit()
 }
 
+var errorInterface = reflect.TypeOf((*error)(nil)).Elem()
+
 func (mk *mockit) MysqlQueryExpect(ep ExpectParam, tb testing.TB) {
 	var (
-		rows *sqlmock.Rows
-		err  error
+		rows        *sqlmock.Rows
+		errExpected bool
+		err         error
 	)
 	p := ep.(*expectParam)
 	if len(p.method) == 0 {
@@ -175,9 +178,13 @@ func (mk *mockit) MysqlQueryExpect(ep ExpectParam, tb testing.TB) {
 	} else {
 		if len(p.returns) != 1 {
 			tb.Fatal("the query must return one result")
-
 		}
-		rows, err = sqlmock.NewRowsFromInterface(p.returns[0], mk.ormTag)
+		typ := reflect.TypeOf(p.returns[0])
+		if typ.Implements(errorInterface) {
+			errExpected = true
+		} else {
+			rows, err = sqlmock.NewRowsFromInterface(p.returns[0], mk.ormTag)
+		}
 	}
 	if err != nil {
 		tb.Fatalf("new rows failed:%s", err)
@@ -186,7 +193,11 @@ func (mk *mockit) MysqlQueryExpect(ep ExpectParam, tb testing.TB) {
 	for _, v := range p.args {
 		args = append(args, v)
 	}
-	mk.sqlEx.ExpectQuery(p.method).WithArgs(args...).WillReturnRows(rows)
+	if errExpected {
+		mk.sqlEx.ExpectQuery(p.method).WithArgs(args...).WillReturnError(p.returns[0].(error))
+	} else {
+		mk.sqlEx.ExpectQuery(p.method).WithArgs(args...).WillReturnRows(rows)
+	}
 }
 
 func (mk *mockit) InterfaceExpect(ep ExpectParam, tb testing.TB) {
